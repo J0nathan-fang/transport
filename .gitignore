@@ -1,0 +1,18 @@
+# Python 编译文件
+__pycache__/
+*.py[cod]
+
+# PyCharm 配置文件夹 (每个人配置不同，不要上传)
+.idea/
+
+# 虚拟环境 (库太多，体积大，不要上传)
+venv/
+env/
+.env
+
+# 数据库连接配置 (包含密码，严禁上传！)
+config.py
+secrets.py
+
+# macOS 系统文件
+.DS_Store
