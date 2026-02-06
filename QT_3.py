@@ -3,9 +3,9 @@ import os
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from RandomF_3 import IrisModelAnalyzer
 from ui.analysis_1 import UiForm
-# import warnings
+import warnings
 # 忽略警告
-# warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore')
 
 
 class MyDataApp(QMainWindow, UiForm):
