@@ -1,31 +1,37 @@
 import sys
 import os
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
+from PyQt6 import uic
 from RandomF_3 import IrisModelAnalyzer
-from ui.analysis_1 import UiForm
 import warnings
 # 忽略警告
 warnings.filterwarnings('ignore')
 
 
-class MyDataApp(QMainWindow, UiForm):
+class MyDataApp(QMainWindow):
     def __init__(self):
         super().__init__()
         # 初始化 UI 界面
-        self.setupUi(self)
+
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        ui_file_path = os.path.join(current_dir, 'ui', 'main.ui')
+        
+        if not os.path.exists(ui_file_path):
+            print(f"❌ 错误: 找不到 UI 文件: {ui_file_path}")
+            sys.exit(1)
+        self.ui = uic.loadUi(ui_file_path, self)
+
 
         # 实例化业务逻辑类
         self.analyzer = IrisModelAnalyzer()
 
         # 信号与槽连接
         # 1. 选择文件
-        # 当 btn_select 被点击时，执行 self.on_select_file 函数
-        self.btn_import.clicked.connect(self.on_select_file)
+        if hasattr(self, 'btn_import'):
+            self.btn_import.clicked.connect(self.on_select_file)
         # 2. 开始分析
         if hasattr(self, 'btn_analyze'):
             self.btn_analyze.clicked.connect(self.on_run_analysis)
-        else:
-            print("⚠️ 警告: UI中未找到 btn_analyze 按钮，请检查 .ui 文件")
 
     def on_select_file(self):
         """
@@ -57,11 +63,11 @@ class MyDataApp(QMainWindow, UiForm):
         if not file_path:
             QMessageBox.warning(self, "提示", "请先选择一个数据文件！")
             return
-        # 2. 界面提示正在运行
+        # 2. 界面提示
         if hasattr(self, 'textBrowser_log'):
             self.textBrowser_log.setText(f"正在分析 {file_path} ...\n请稍候...")
-            QApplication.processEvents()  # 强制刷新界面，防止卡顿感
-        # 3. 调用后台逻辑 (RandomF_2)
+            QApplication.processEvents()  # 刷新界面
+        # 3. 调用后台逻辑
         # run_analysis 现在返回的是一个包含所有结果的长字符串
         result_text = self.analyzer.run_analysis(file_path)
         # 4. 将结果显示在文本框中
