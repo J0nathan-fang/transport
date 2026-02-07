@@ -1,123 +1,102 @@
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.ensemble import RandomForestClassifier
+import os
+import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
 
-# -------------------------- 全局配置：解决中文显示和负号问题 --------------------------
-plt.rcParams['font.sans-serif'] = ['SimHei']  # 黑体显示中文
-plt.rcParams['axes.unicode_minus'] = False    # 解决负号显示异常
-plt.rcParams['figure.figsize'] = (12, 7)      # 全局画布大小
-plt.rcParams['font.size'] = 12                # 全局字体大小
 
-# -------------------------- 1、读取红酒数据集并设置列名 --------------------------
-# 读取本地wine.txt文件（无表头，header=None）
-df = pd.read_csv(r'wine.txt', header=None)
-# 设置列名：第0列为类别标签，1-13列为特征
-df.columns = ['Class label', 'Alcohol', 'Malic acid', 'Ash',
-              'Alcalinity of ash', 'Magnesium', 'Total phenols',
-              'Flavanoids', 'Nonflavanoid phenols', 'Proanthocyanins',
-              'Color intensity', 'Hue', 'OD280/OD315 of diluted wines', 'Proline']
+class IrisModelAnalyzer:
+    def __init__(self):
+        # 初始化一些成员变量
+        self.model = None
+        self.column_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'class']
 
-# -------------------------- 2、划分特征矩阵X和目标向量Y --------------------------
-# 特征X：第1列到最后一列（所有特征列），目标Y：第0列（类别标签）
-X = df.iloc[:, 1:].values  # 特征矩阵，(178,13)
-Y = df.iloc[:, 0].values   # 目标向量，(178,)
-# 提取特征标签（用于后续可视化和输出）
-feat_labels = df.columns[1:]  # 13个特征的名称列表
+    def run_analysis(self, file_path):
+        """
+        执行完整的训练和预测流程，并返回分析结果文本。
+        """
+        # 用于收集输出日志，最后统一返回给界面显示
+        logs = []
 
-# -------------------------- 3、分割训练集和测试集 --------------------------
-# 测试集占比30%，随机种子0保证结果可复现，分层抽样保证类别分布一致
-X_train, X_test, Y_train, Y_test = train_test_split(
-    X, Y, test_size=0.3, random_state=0, stratify=Y
-)
+        def log(text):
+            logs.append(str(text))
+            # 同时也打印到控制台，方便调试
+            print(text)
 
-# -------------------------- 4、训练随机森林模型并计算特征重要性 --------------------------
-# 初始化随机森林分类器：10000棵树，多线程训练，固定随机种子
-# 修复原代码：random_st`在这里插入代码片`ate → random_state（语法错误）
-forest = RandomForestClassifier(
-    n_estimators=10000,  # 森林中树的数量，数量越多结果越稳定
-    random_state=0,      # 固定随机种子，结果可复现
-    n_jobs=-1            # 多线程训练（利用所有CPU核心），提升训练速度
-)
-# 模型训练（仅用训练集，避免数据泄露）
-forest.fit(X_train, Y_train)
+        # 1. 检查文件
+        if not os.path.exists(file_path):
+            return f"❌ 错误：找不到文件 '{file_path}'"
 
-# 提取特征重要性：feature_importances_ 是随机森林的核心属性，值越大特征越重要
-importances = forest.feature_importances_
-print("="*80)
-print("所有特征原始重要性值：\n", importances)
-print("="*80)
+        try:
+            log(f"正在从 {file_path} 加载数据...")
 
-# -------------------------- 5、特征重要性排序并打印详细结果 --------------------------
-# np.argsort(importances)[::-1]：先升序排序取索引，再逆序→得到重要性从高到低的索引
-indices = np.argsort(importances)[::-1]
-# 存储排序后的特征名称（用于后续可视化）
-sorted_feat_labels = []
+            # 读取文件
+            df = pd.read_csv(file_path, header=None, names=self.column_names)
+            log(f"数据加载成功。共 {len(df)} 条记录。")
 
-# 按重要性从高到低打印特征排名、名称、重要性值
-print("特征重要性排名（从高到低）：")
-for f in range(X_train.shape[1]):  # X_train.shape[1] = 13（特征数量）
-    rank = f + 1  # 排名（从1开始）
-    feat_name = feat_labels[indices[f]]  # 排序后的特征名称
-    feat_imp = importances[indices[f]]   # 排序后的特征重要性值
-    sorted_feat_labels.append(feat_name) # 保存排序后的特征名称
-    # 格式化打印：排名、特征名称（占30字符）、重要性值（保留6位小数）
-    print("%2d) %-*s %.6f" % (rank, 30, feat_name, feat_imp))
-print("="*80)
+            # 2. 数据集划分
+            X = df.drop('class', axis=1)
+            y = df['class']
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# -------------------------- 6、筛选高重要性特征（按阈值过滤） --------------------------
-threshold = 0.15  # 重要性阈值，可根据需求调整
-# 筛选训练集中重要性 > 阈值的特征，返回筛选后的特征矩阵
-X_train_selected = X_train[:, importances > threshold]
-# 打印筛选结果
-selected_feat_names = feat_labels[importances > threshold]  # 筛选后的特征名称
-print(f"重要性阈值 = {threshold}，筛选后的特征数量：{len(selected_feat_names)}")
-print(f"筛选后的特征名称：{list(selected_feat_names)}")
-print(f"筛选后训练集特征矩阵形状：{X_train_selected.shape}")  # 原(124,13) → 筛选后(124, n)
-print("="*80)
+            # 3. 模型训练
+            log("正在训练随机森林模型...")
+            self.model = RandomForestClassifier(n_estimators=100, random_state=42)
+            self.model.fit(X_train, y_train)
 
-# -------------------------- 7、可视化特征重要性（优化版柱状图） --------------------------
-plt.figure()
-# 绘制柱状图：x为特征索引，y为排序后的重要性值，橙色填充，居中对齐
-plt.bar(
-    x=np.arange(len(feat_labels)),  # x轴：0-12（13个特征）
-    height=importances[indices],    # y轴：按重要性从高到低排序的值
-    color='#FF7F0E',                # 橙色（美观且醒目）
-    align='center',                 # 柱子居中对齐
-    alpha=0.8                       # 透明度，避免遮挡
-)
+            # 4. 预测与评估
+            y_pred = self.model.predict(X_test)
+            acc = accuracy_score(y_test, y_pred)
 
-# 设置图表标题和坐标轴标签
-plt.title('红酒数据集-随机森林特征重要性排序', fontsize=18, pad=20)
-plt.ylabel('特征重要性', fontsize=16)
-plt.xlabel('特征名称', fontsize=16, labelpad=10)
+            log("-" * 30)
+            log(f"✅ 模型准确率 (Accuracy): {acc:.4f}")
+            log("\n分类报告:")
+            log(classification_report(y_test, y_pred))
 
-# 设置x轴刻度：替换为排序后的特征名称，旋转90度避免重叠，调整字体大小
-plt.xticks(
-    ticks=np.arange(len(feat_labels)),
-    labels=sorted_feat_labels,
-    rotation=90,
-    fontsize=11
-)
+            # 5. 特征重要性
+            log("-" * 30)
+            log("特征重要性分析:")
+            importances = self.model.feature_importances_
+            feature_imp_df = pd.DataFrame({'Feature': X.columns, 'Importance': importances})
+            log(feature_imp_df.sort_values(by='Importance', ascending=False).to_string(index=False))
 
-# 设置y轴范围：从0开始，上限略高于最大重要性值，提升美观度
-plt.ylim(0, max(importances) * 1.1)
+            # 6. 随机样本预测演示
+            log("-" * 30)
+            log("正在生成随机样本进行测试...")
 
-# 为每个柱子标注重要性值（保留4位小数），显示在柱子顶部
-for i, imp in enumerate(importances[indices]):
-    plt.text(
-        x=i,
-        y=imp + 0.005,  # 数值在柱子顶部上方0.005处
-        s=f'{imp:.4f}', # 保留4位小数
-        ha='center',    # 水平居中
-        va='bottom',    # 垂直靠下
-        fontsize=10
-    )
+            min_values = X.min()
+            max_values = X.max()
 
-# 添加网格线（仅y轴），提升可读性
-plt.grid(True, alpha=0.3, axis='y')
-# 自动调整布局，防止标签、标题重叠
-plt.tight_layout()
-# 显示图表
-plt.show()
+            # 生成随机数据
+            random_features = np.random.uniform(low=min_values, high=max_values)
+            new_sample_reshaped = random_features.reshape(1, -1)
+
+            # 创建 DataFrame (修复之前的警告问题)
+            new_sample_df = pd.DataFrame(new_sample_reshaped, columns=X.columns)
+
+            log("\n生成的随机样本:")
+            log(new_sample_df.round(2).to_string(index=False))
+
+            # 预测
+            prediction = self.model.predict(new_sample_df)
+            log("-" * 30)
+            log(f"🌲 随机样本预测结果: {prediction[0]}")
+
+            # 将列表合并成一个长字符串返回
+            return "\n".join(logs)
+
+        except Exception as e:
+            error_msg = f"❌ 发生未知错误: {str(e)}"
+            print(error_msg)
+            return error_msg
+
+
+# 单元测试代码
+if __name__ == "__main__":
+    analyzer = IrisModelAnalyzer()
+    # 测试一下当前目录是否有 iris.csv
+    if os.path.exists('iris.csv'):
+        print(analyzer.run_analysis('iris.csv'))
+    else:
+        print("当前目录无 iris.csv，请先准备数据。")
