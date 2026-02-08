@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>515</width>
+    <width>625</width>
     <height>518</height>
    </rect>
   </property>
@@ -16,7 +16,7 @@
   <widget class="QPushButton" name="btn_analyze">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>200</x>
      <y>90</y>
      <width>201</width>
      <height>25</height>
@@ -31,7 +31,7 @@
     <rect>
      <x>60</x>
      <y>130</y>
-     <width>391</width>
+     <width>511</width>
      <height>361</height>
     </rect>
    </property>
@@ -44,8 +44,8 @@
   <widget class="QPushButton" name="btn_import">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>50</y>
+     <x>100</x>
+     <y>40</y>
      <width>75</width>
      <height>25</height>
     </rect>
@@ -57,9 +57,9 @@
   <widget class="QLineEdit" name="line_file_path">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>50</y>
-     <width>261</width>
+     <x>200</x>
+     <y>40</y>
+     <width>331</width>
      <height>21</height>
     </rect>
    </property>

@@ -12,7 +12,7 @@ class RFAnalyzer:
     """
     def run_analysis(self, file_path):
         """
-        执行完整的训练和预测流程，并返回分析结果文本。
+        执行完整的训练和预测流程，并返回分析结果文本
         """
         # 用于收集输出日志，最后统一返回给界面显示
         logs = []
