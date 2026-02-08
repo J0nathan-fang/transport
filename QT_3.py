@@ -2,7 +2,7 @@ import sys
 import os
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt6 import uic
-from RandomF import IrisModelAnalyzer
+from RandomF import RFAnalyzer
 import warnings
 # 忽略警告
 warnings.filterwarnings('ignore')
@@ -22,7 +22,7 @@ class MyDataApp(QMainWindow):
         self.ui = uic.loadUi(ui_file_path, self)
 
         # 实例化业务逻辑类
-        self.analyzer = IrisModelAnalyzer()
+        self.analyzer = RFAnalyzer()
 
         # 信号与槽连接
         # 选择文件
