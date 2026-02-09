@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import StratifiedKFold
 
 class RFAnalyzer:
     """
@@ -51,12 +53,12 @@ class RFAnalyzer:
 
             # 数据集划分
             x_train, x_test, y_train, y_test = train_test_split(
-                x, y, test_size=0.3, random_state=42
+                x, y, test_size=0.3, random_state=None
             )
 
             # 模型训练
             log("正在训练随机森林模型...")
-            self.model = RandomForestClassifier(n_estimators=100, random_state=42)
+            self.model = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=None)
             self.model.fit(x_train, y_train)
 
             # 预测与评估
@@ -74,6 +76,14 @@ class RFAnalyzer:
             importances = self.model.feature_importances_
             feature_imp_df = pd.DataFrame({'Feature': x.columns, 'Importance': importances})
             log(feature_imp_df.sort_values(by='Importance', ascending=False).to_string(index=False))
+
+            # KFC验证
+            log("-" * 30)
+            log("K折交叉验证分析:")
+            splitter = StratifiedKFold(n_splits=5, shuffle=True, random_state=None)
+            scores = cross_val_score(self.model, x, y, cv=splitter)
+            log(f"\n每次得分: {scores.round(2)}")
+            log(f"平均准确率: {scores.mean():.3f}")
 
             # 随机样本预测演示
             log("-" * 30)
