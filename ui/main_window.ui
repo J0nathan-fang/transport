@@ -44,7 +44,7 @@
   <widget class="QPushButton" name="btn_import">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>110</x>
      <y>40</y>
      <width>75</width>
      <height>25</height>

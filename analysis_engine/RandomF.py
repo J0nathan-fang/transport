@@ -7,6 +7,8 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import StratifiedKFold
+from data_manager import Loader
+from data_manager import Cleaner
 
 class RFAnalyzer:
     """
@@ -32,10 +34,13 @@ class RFAnalyzer:
             log(f"正在从 {file_path} 加载数据...")
 
             # 读取文件
-            df = pd.read_csv(file_path)
-            log(f"数据加载成功。共 {len(df)} 条记录。")
-            if df.shape[1] < 2:
-                return "❌ 错误：数据文件列数不足，至少需要2列（特征列 + 目标列）。"
+            cleaner = Cleaner()
+            loader = Loader()
+            raw_df = loader.load_csv(file_path)
+            if raw_df is None:
+                return "❌ 错误：数据加载失败，请检查文件格式或内容。"
+            df = cleaner.clean_data(raw_df)
+
             x = df.iloc[:, :-1]
             y = df.iloc[:, -1]
 

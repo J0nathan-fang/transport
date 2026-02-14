@@ -2,7 +2,7 @@ import sys
 import os
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt6 import uic
-from RandomF import RFAnalyzer
+from analysis_engine import RFAnalyzer
 import warnings
 # 忽略警告
 warnings.filterwarnings('ignore')
@@ -14,7 +14,7 @@ class MyDataApp(QMainWindow):
         # UI初始化
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        ui_file_path = os.path.join(current_dir, 'ui', 'main.ui')
+        ui_file_path = os.path.join(current_dir, 'ui', 'main_window.ui')
         
         if not os.path.exists(ui_file_path):
             print(f"❌ 错误: 找不到 UI 文件: {ui_file_path}")
