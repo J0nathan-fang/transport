@@ -3,7 +3,6 @@ import os
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt6 import uic
 from analysis_engine import RFAnalyzer
-import pandas as pd
 from data_manager import Loader
 
 class MyDataApp(QMainWindow):
