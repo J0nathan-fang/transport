@@ -1,0 +1,70 @@
+{
+  "name": "traffic-risk-analysis",
+  "version": "1.0.0",
+  "description": "交通事故风险预测系统",
+  "main": "electron/main.js",
+  "scripts": {
+    "electron:dev": "set NODE_ENV=development && electron .",
+    "electron:build": "npm run build:frontend && npm run build:python && node_modules\\.bin\\electron-builder.cmd",
+    "build:frontend": "cd frontend && npm run build",
+    "build:python": "cd fastapi && pyinstaller --onefile --name backend-server --add-data \"models/*.pkl;models/\" --hidden-import=uvicorn.logging --hidden-import=uvicorn.loops.auto --hidden-import=uvicorn.protocols.http.auto main.py",
+    "start:frontend": "cd frontend && npm run dev",
+    "start:backend": "cd fastapi && uvicorn main:app --host 0.0.0.0 --port 8081 --reload"
+  },
+  "dependencies": {
+    "echarts": "^6.0.0",
+    "electron": "^41.5.0",
+    "electron-builder": "^26.8.1",
+    "tree-kill": "^1.2.2"
+  },
+  "build": {
+    "appId": "com.traffic.risk.analysis",
+    "productName": "交通事故风险预测系统",
+    "copyright": "Copyright © 2024",
+    "directories": {
+      "output": "release",
+      "buildResources": "electron"
+    },
+    "files": [
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "fastapi/dist/",
+        "to": "backend/",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "frontend/dist/",
+        "to": "frontend/",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^41.5.0",
+    "electron-builder": "^26.8.1",
+    "tree-kill": "^1.2.2"
+  }
+}

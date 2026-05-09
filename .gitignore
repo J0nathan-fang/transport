@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+target/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment files (may contain secrets)
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# ML model files (large binary files)
+*.pkl
+
+# Electron build artifacts
+out/
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# PyInstaller
+*.spec
+
+# API credentials (contains real keys/secrets)
+application.yml

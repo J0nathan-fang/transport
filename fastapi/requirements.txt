@@ -1,0 +1,33 @@
+# FastAPI 交通事故预测系统依赖包
+
+# Web框架
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# 异步HTTP客户端
+httpx==0.25.2
+
+# 数据处理
+numpy>=2.0
+joblib>=1.5
+scikit-learn>=1.5
+
+# 环境变量管理
+python-dotenv==1.0.0
+
+# JWT认证
+PyJWT==2.8.0
+cryptography>=42.0.0
+
+# 日志和配置
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# 可选：性能优化
+orjson==3.9.10
+
+# 桌面应用
+pywebview==4.4.1
+
+# HTTP客户端（用于服务器状态检查）
+requests==2.31.0
